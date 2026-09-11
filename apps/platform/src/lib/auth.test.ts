@@ -1,7 +1,7 @@
 // @vitest-environment node
 // Auth helpers are server-side; the node environment also avoids the jose/jsdom
 // realm mismatch that breaks `Uint8Array instanceof` checks during signing.
-import { SignJWT, generateKeyPair, type KeyLike } from "jose";
+import { SignJWT, generateKeyPair, type GenerateKeyPairResult } from "jose";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 const { withAuthMock, getWorkOSMock, createRemoteJWKSetMock, redirectMock } = vi.hoisted(
@@ -29,7 +29,9 @@ vi.mock("jose", async (importOriginal) => {
   return { ...actual, createRemoteJWKSet: createRemoteJWKSetMock };
 });
 
-type KeyPair = { publicKey: KeyLike; privateKey: KeyLike };
+// jose v6 dropped its `KeyLike` alias along with Node KeyObject support;
+// `generateKeyPair` now hands back CryptoKeys, so mirror its own result type.
+type KeyPair = GenerateKeyPairResult;
 
 // The key WorkOS "owns" (its JWKS resolves to this public key) and an attacker
 // key that WorkOS would never sign with.
@@ -44,7 +46,7 @@ function bearerRequest(token: string) {
 }
 
 async function signWith(
-  privateKey: KeyLike,
+  privateKey: KeyPair["privateKey"],
   claims: Record<string, unknown>,
   expSeconds = Math.floor(Date.now() / 1000) + 3600,
 ) {

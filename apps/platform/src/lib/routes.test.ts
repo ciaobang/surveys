@@ -21,7 +21,7 @@ describe("routes", () => {
 
   it("keeps static page destinations unique", () => {
     const staticDestinations = Object.values(routes).filter(
-      (value): value is string => typeof value === "string",
+      (value) => typeof value === "string",
     );
     expect(new Set(staticDestinations).size).toBe(staticDestinations.length);
   });
@@ -35,7 +35,7 @@ describe("apiRoutes", () => {
 
   it("keeps static API endpoints unique", () => {
     const staticEndpoints = Object.values(apiRoutes).filter(
-      (value): value is string => typeof value === "string",
+      (value) => typeof value === "string",
     );
     expect(new Set(staticEndpoints).size).toBe(staticEndpoints.length);
   });
